@@ -1,9 +1,12 @@
-# CS419_Group_1_Project
+# CS419_Group_1_ProjectByAlex
 
-<<<<<<< HEAD
+
 asdfadme.
 And now I'asdfd it'
-=======
+
+
 This is the readme.
 And now Jesse has edited it'
->>>>>>> Jesse's edit to Readme
+Jesse's edit to Readme
+
+edited readme branch
