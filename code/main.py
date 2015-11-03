@@ -3,10 +3,6 @@ from loginscreen import LoginScreen
 import time
 from Animators import Animators
 
-
-
-#Should we be printing non-curses output?
-#print("started")
 screen = LoginScreen()
 screen.welcome()
 selection = screen.selector(0)
