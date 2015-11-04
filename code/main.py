@@ -2,6 +2,8 @@ import curses
 from loginscreen import LoginScreen
 import time
 from Animators import Animators
+from menu import Menu
+from menu import MyApp
 
 screen = LoginScreen()
 screen.welcome()
@@ -15,7 +17,7 @@ else :
     login_success = screen.login()
 
 if login_success:
-	print 'Woohoo, everything works!'
+	curses.wrapper(MyApp)
 else:
 	print 'oops! something didn\'t work'
 
