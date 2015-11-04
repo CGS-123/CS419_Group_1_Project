@@ -17,5 +17,8 @@ su -c 'createdb vagrant' vagrant
 su -c "psql -c 'create table a (a json);'" vagrant
 su -c "psql -c 'create database worlddb;'" vagrant
 su -c "psql worlddb < /vagrant/world.sql" vagrant
+su -c "psql -c 'create database users;'" vagrant
+su -c "psql users < /vagrant/users.sql" vagrant
+
 
 # end
