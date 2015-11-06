@@ -1,62 +1,149 @@
 import curses
 import psycopg2
-import pprint
+from error import error
+
+
+#functions in Class:
+#   fetch() - used for psql queries that return information. (i.e. SELECT)
+#   execute() - used for psql queires that create/modify information (i.e.
+#   CREATE, INSERT, DROP, DELETE)
 
 class query:
+
+    #director function
     @staticmethod
-    def select(query, db):
-        #exceptions for debugging purposes
+    def query(string, db, screen = None):
+        select = string.split(" ")
+        if select[0].lower() == "select":
+            return query.fetch(string, db, screen)
+        else:
+            return query.execute(string, db, screen)
+
+
+    #NOTE: overloaded function,  if provided screen, will display error
+    #method used to return any values from a database given a string query
+    #on succes returns list of elelemts
+    #on fail throws error screen and returns -1 !!Needs to be handled!!
+    @staticmethod
+    def fetch(query, db, screen = None):
+        
         try:
             string = "dbname=\'" + db + "\' user='vagrant' password='vagrant'"
             conn = psycopg2.connect(string)
         except:
-            print "error to connecting to users database"
-            return
+            if screen is not None:
+                error.throw(screen, "Error to connecting to \'" + db + "\' database.")
+                return -1
+            else:
+                return -1
 
         try:
             cur = conn.cursor()
         except:
-            print "error creating cursor"
-            return
+            if screen is not None:
+                error.throw(screen, "Error creating cursor.")
+                return -1
+            else:
+                return -1
 
         try:
             cur.execute(query)
         except:
-            print "error executing query"
-            return
+            if screen is not None:
+                error.throw(screen, "Error executing query.")
+                return -1
+            else:
+                return -1
 
         try:
             rows = cur.fetchall()
         except:
-            print "error executing fetch"
-            return
+            if screen is not None:
+                error.throw(screen, "Error executing fetch.")
+                return -1
+            else:
+                return -1
 
-        cur.close()
-        conn.close()
+        try:
+            cur.close()
+        except:
+            if screen is not None:
+                error.throw(screen, "Error closing cursor.")
+                return -1
+            else:
+                return -1
+
+        try:
+            conn.close()
+        except:
+            if screen is not None:
+                error.throw(screen, "Error closing connection.")
+                return -1
+            else:
+                return -1
+        
         return rows
 
+    #NOTE: overloaded function,  if provided screen, will display error
+    #method used to return any values from a database given a string query
+    #on succes returns 0
+    #on fail throws error screen and returns -1 !!Needs to be handled!!
     @staticmethod
-    def insert(query, db):
+    def execute(query, db, screen = None):
     	#exceptions for debugging purposes
         try:
             string = "dbname=\'" + db + "\' user='vagrant' password='vagrant'"
             conn = psycopg2.connect(string)
         except:
-            print "error to connecting to users database"
-            return
+            if screen is not None:
+                error.throw(screen, "Error to connecting to \'" + db + "\' database.")
+                return -1
+            else:
+                return -1
 
         try:
             cur = conn.cursor()
         except:
-            print "error creating cursor"
-            return
+            if screen is not None:
+                print error.throw(screen, "Error creating cursor.")
+                return -1
+            else:
+                return -1
 
         try:
             cur.execute(query)
         except:
-            print "error executing query"
-            return
+            if screen is not None:
+                error.throw(screen, "Error executing query.")
+                return -1
+            else:
+                return -1
 
-        conn.commit()
-        cur.close()
-        conn.close()
+        try:
+            conn.commit()
+        except:
+            if screen is not None:
+                error.throw(screen, "Error commiting query.")
+                return -1
+            else:
+                return -1
+
+        try:
+            cur.close()
+        except:
+            if screen is not None:
+                error.throw(screen, "Error closing cursor.")
+                return -1
+            else:
+                return -1
+
+        try:
+            conn.close()
+        except:
+            if screen is not None:
+                error.throw(screen, "Error closing connection.")
+                return -1
+            else:
+                return -1
+
+        return 0
