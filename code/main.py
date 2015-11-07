@@ -10,11 +10,11 @@ screen.welcome()
 selection = screen.selector(0)
 
 login_success = False
-
-if selection:
-    login_success = screen.create_user()
-else :
-    login_success = screen.login()
+while not login_success:
+    if selection:
+        login_success = screen.create_user()
+    else:
+        login_success = screen.login()
 
 if login_success:
 	curses.wrapper(MyApp)

@@ -4,6 +4,7 @@ import time
 import pprint
 from Animators import Animators
 from query import query
+from error import error
 
 class LoginScreen:       
     def __init__(self):
@@ -16,17 +17,15 @@ class LoginScreen:
         self.screen.keypad(1)
         dimensions = self.screen.getmaxyx()
         self.screen.clear()
+        message = "Select Using ->, <-, and Enter:"
+        self.screen.addstr(dimensions[0]/3, dimensions[1]/2 - len(message)/2, message)
         if(location):
-            message = "Select Using ->, <-, and Enter:"
-            self.screen.addstr(dimensions[0]/3, dimensions[1]/2 - len(message)/2, message)
             message = 'Login'
             self.screen.addstr(dimensions[0]/2, dimensions[1]/3 - len(message)/2, message, curses.A_DIM)
             message = 'Create User'
             self.screen.addstr(dimensions[0]/2, 2 * dimensions[1]/3 - len(message)/2, message, curses.A_STANDOUT)  
             self.screen.refresh()
         else:
-            message = "Select Using ->, <-, and Enter:"
-            self.screen.addstr(dimensions[0]/3, dimensions[1]/2 - len(message)/2, message)
             message = 'Login'
             self.screen.addstr(dimensions[0]/2, dimensions[1]/3 - len(message)/2, message, curses.A_STANDOUT)
             message = 'Create User'
@@ -45,40 +44,45 @@ class LoginScreen:
 
     #function used to insert a new user into the databse:
     def create_user(self):
-        LoginScreen.display_mid(self, 'Please enter your desired username: ')
+        LoginScreen.display_mid(self, 'Please enter your desired Username: ')
         self.username = self.screen.getstr()
-        LoginScreen.display_mid(self, 'Please enter your desired password: ')
+        LoginScreen.display_mid(self, 'Please enter your desired Password: ')
         self.password = self.screen.getstr()
         curses.endwin()
 
         to_query = "SELECT * FROM users WHERE un LIKE \'%s\'" % self.username
-        rows = query.select(to_query, 'users')
+        rows = query.query(to_query, 'users', self.screen)
         
         if rows:
-            LoginScreen.display_mid(self, 'Username already in use.')
-            time.sleep(3)
+            error.throw(self.screen, 'Username already in use.')
             return LoginScreen.create_user(self)
         else:
             to_query = "INSERT INTO users (un, pw) VALUES (\'%s\', \'%s\')" % (self.username, self.password)
-            query.insert(to_query, 'users');
+            if query.query(to_query, 'users', self.screen) == -1:
+                error.throw(self.screen, "An error prevented user creation.")
+                return False
             return True
 
     def login(self):
        
-        LoginScreen.display_mid(self, 'Please enter your username: ')
+        LoginScreen.display_mid(self, 'Please enter your Username: ')
         self.username = self.screen.getstr()
-        LoginScreen.display_mid(self, 'Please enter your password: ')
+        LoginScreen.display_mid(self, 'Please enter your Password: ')
         self.password = self.screen.getstr()
         curses.endwin()
 
 
         #query the database and check if name and password are correct
         to_query = "SELECT * FROM users WHERE un LIKE \'%s\' AND pw LIKE \'%s\'" % (self.username, self.password)
-        rows = query.select(to_query, 'users')
+        rows = query.query(to_query, 'users', self.screen)
         
-        if rows:
+        if rows and rows != -1:
             return True
+        elif rows == -1:
+            error.throw(self.screen, "Couldn't access 'users' database. Please ensure your system is set up correctly.")
+            return False
         else:
+            error.throw(self.screen, "Incorrect Username or Password.")
             return False
 
     #function that prints a flowing welcome message

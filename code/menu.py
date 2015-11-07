@@ -60,8 +60,15 @@ class Menu(object):
 class MyApp(object):                                                         
 
     def __init__(self, stdscreen):                                           
-        self.screen = stdscreen                                              
-        curses.curs_set(0)                                                   
+        self.screen = stdscreen
+        #I ran into an error here when trying to set cursur to invisible
+        #this if/try makes sure that both the version of curses and the 
+        #terminal support this functionality  
+        if hasattr(curses, 'curs_set'):
+            try:                                            
+                curses.curs_set(0)                                                   
+            except:
+                pass
 
         data_items = [                                                    
                 ('Import', curses.beep),                                       
