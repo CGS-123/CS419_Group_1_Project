@@ -1,5 +1,6 @@
 import curses                                                                
 from curses import panel                                                     
+from exports import impexp
 
 class Menu(object):                                                          
 
@@ -69,10 +70,10 @@ class MyApp(object):
                 curses.curs_set(0)                                                   
             except:
                 pass
-
+        importer = impexp(self.screen)
         data_items = [                                                    
                 ('Import', curses.beep),                                       
-                ('Export', curses.flash)                                      
+                ('Export', importer.export)                                      
                 ]                                                            
         data = Menu(data_items, self.screen)                           
 
@@ -106,4 +107,4 @@ class MyApp(object):
                 ('Query',query.display)                                 
                 ]                                                            
         main_menu = Menu(main_menu_items, self.screen)                       
-        main_menu.display()                                                  
+        main_menu.display()                                              
