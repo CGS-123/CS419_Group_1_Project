@@ -1,5 +1,6 @@
 import curses                                                                
-from curses import panel                                                     
+from curses import panel
+from databaseManager import DatabaseManager                                                     
 
 class Menu(object):                                                          
 
@@ -12,7 +13,7 @@ class Menu(object):
 
         self.position = 0                                                    
         self.items = items                                                   
-        self.items.append(('exit','exit'))                                   
+        self.items.append(('exit','exit'))                                  
 
     def navigate(self, n):                                                   
         self.position += n                                                   
@@ -43,7 +44,7 @@ class Menu(object):
             if key in [curses.KEY_ENTER, ord('\n')]:                         
                 if self.position == len(self.items)-1:                       
                     break                                                    
-                else:                                                        
+                else:                                                   
                     self.items[self.position][1]()                           
 
             elif key == curses.KEY_UP:                                       
@@ -61,6 +62,7 @@ class MyApp(object):
 
     def __init__(self, stdscreen):                                           
         self.screen = stdscreen
+        self.database_manager = DatabaseManager()
         #I ran into an error here when trying to set cursur to invisible
         #this if/try makes sure that both the version of curses and the 
         #terminal support this functionality  
@@ -76,7 +78,8 @@ class MyApp(object):
                 ]                                                            
         data = Menu(data_items, self.screen)                           
 
-        browse_database_items = [                                                    
+        browse_database_items = [
+                ('List Databases', self.display_all_databases),
                 ('Search', curses.beep),                                       
                 ('Create', curses.flash),
                 ('Copy', curses.flash),
@@ -106,4 +109,16 @@ class MyApp(object):
                 ('Query',query.display)                                 
                 ]                                                            
         main_menu = Menu(main_menu_items, self.screen)                       
-        main_menu.display()                                                  
+        main_menu.display()  
+        
+    def display_all_databases(self):   
+        parsed_dbs = []
+        databases = self.database_manager.fetch_all_databases()
+        if databases is not None:
+            for db in databases:
+                lst = list(db)
+                lst.append(curses.flash)
+                parsed_dbs.append(tuple(lst))
+            displayDatabasesMenu = Menu(parsed_dbs, self.screen)
+            displayDatabasesMenu.display()
+            
