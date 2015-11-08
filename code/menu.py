@@ -10,7 +10,6 @@ class Menu(object):
         self.panel = panel.new_panel(self.window)                            
         self.panel.hide()                                                    
         panel.update_panels()                                                
-
         self.position = 0                                                    
         self.items = items                                                   
         self.items.append(('exit','exit'))                                  
@@ -27,7 +26,7 @@ class Menu(object):
         self.panel.show()                                                    
         self.window.clear()                                                  
 
-        while True:                                                          
+        while True:    
             self.window.refresh()                                            
             curses.doupdate()                                                
             for index, item in enumerate(self.items):                        
@@ -66,12 +65,7 @@ class MyApp(object):
         #I ran into an error here when trying to set cursur to invisible
         #this if/try makes sure that both the version of curses and the 
         #terminal support this functionality  
-        if hasattr(curses, 'curs_set'):
-            try:                                            
-                curses.curs_set(0)                                                   
-            except:
-                pass
-
+        self.set_cursor_invisible()
         data_items = [                                                    
                 ('Import', curses.beep),                                       
                 ('Export', curses.flash)                                      
@@ -81,7 +75,7 @@ class MyApp(object):
         browse_database_items = [
                 ('List Databases', self.display_all_databases),
                 ('Search', curses.beep),                                       
-                ('Create', curses.flash),
+                ('Create', self.create_new_database),
                 ('Copy', curses.flash),
                 ('Drop', curses.flash)                                      
                 ]                                                            
@@ -121,4 +115,42 @@ class MyApp(object):
                 parsed_dbs.append(tuple(lst))
             displayDatabasesMenu = Menu(parsed_dbs, self.screen)
             displayDatabasesMenu.display()
+            
+    def create_new_database(self):
+        self.set_cursor_visible()
+        curses.echo()
+        self.display_mid("Please enter a name for the new database: ", self.screen)
+        database_name = self.screen.getstr()
+        self.screen.clear()
+        try:
+           did_create_database = self.database_manager.create_database(database_name)
+        except RuntimeError as rt_error:
+           self.display_mid("Error with the database creation query", self.screen)
+        else:
+            if did_create_database is True:
+                self.display_mid("The database " + database_name + " has been created" , self.screen)
+                self.screen.getstr()
+        self.screen.clear()
+        self.set_cursor_invisible()
+        
+    #displays message centered on screen
+    def display_mid(self, message, screen):
+        screen.clear()
+        dimensions = self.screen.getmaxyx() 
+        screen.addstr(dimensions[0]/2, dimensions[1]/2 - len(message)/2, message, curses.A_BOLD)
+        screen.refresh()
+        
+    def set_cursor_invisible(self):
+        if hasattr(curses, 'curs_set'):
+            try:
+                curses.curs_set(0)
+            except:
+                pass
+    
+    def set_cursor_visible(self):
+        if hasattr(curses, 'curs_set'):
+            try:
+                curses.curs_set(1)
+            except:
+                pass
             
