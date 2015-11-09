@@ -55,15 +55,16 @@ class query:
                 return -1
             else:
                 return -1
-
-        try:
-            cur.execute(query)
-        except:
-            if screen is not None:
-                error.throw(screen, "Error executing query.")
-                return -1
-            else:
-                return -1
+        
+        if ISO_level is not 0 or None:
+            try:
+                cur.execute(query)
+            except:
+                if screen is not None:
+                    error.throw(screen, "Error executing query.")
+                    return -1
+                else:
+                    return -1
 
         try:
             rows = cur.fetchall()
@@ -140,14 +141,15 @@ class query:
             else:
                 return -1
 
-        try:
-            conn.commit()
-        except:
-            if screen is not None:
-                error.throw(screen, "Error commiting query.")
-                return -1
-            else:
-                return -1
+        if ISO_level is not 0 or None:
+            try:
+                conn.commit()
+            except:
+                if screen is not None:
+                    error.throw(screen, "Error commiting query.")
+                    return -1
+                else:
+                    return -1
 
         try:
             cur.close()
