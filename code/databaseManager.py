@@ -20,8 +20,8 @@ class DatabaseManager:
             error.throw(self.screen, 'Database already exists.')
             return False
         else:
-            db_creation_query = "PERFORM dblink_exec('dbname=' || current_database()  -- current db, 'CREATE DATABASE \'" + name + "\');"
-            if query.query(db_creation_query, 'postgres', self.screen) == -1:
+            db_creation_query = "CREATE DATABASE " + name 
+            if query.query(db_creation_query, 'postgres', self.screen, 0) == -1:
                 error.throw(self.screen, "An error prevented database creation.")
                 return False
             return True
