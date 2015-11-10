@@ -1,6 +1,7 @@
-import curses                                                                
-from curses import panel                                                     
+import curses                                                                                                                 
 from exports import impexp
+from curses import panel
+from databaseManager import DatabaseManager                                                     
 
 class Menu(object):                                                          
 
@@ -10,10 +11,9 @@ class Menu(object):
         self.panel = panel.new_panel(self.window)                            
         self.panel.hide()                                                    
         panel.update_panels()                                                
-
         self.position = 0                                                    
         self.items = items                                                   
-        self.items.append(('exit','exit'))                                   
+        self.items.append(('exit','exit'))                                  
 
     def navigate(self, n):                                                   
         self.position += n                                                   
@@ -27,7 +27,7 @@ class Menu(object):
         self.panel.show()                                                    
         self.window.clear()                                                  
 
-        while True:                                                          
+        while True:    
             self.window.refresh()                                            
             curses.doupdate()                                                
             for index, item in enumerate(self.items):                        
@@ -44,7 +44,7 @@ class Menu(object):
             if key in [curses.KEY_ENTER, ord('\n')]:                         
                 if self.position == len(self.items)-1:                       
                     break                                                    
-                else:                                                        
+                else:                                                   
                     self.items[self.position][1]()                           
 
             elif key == curses.KEY_UP:                                       
@@ -62,6 +62,7 @@ class MyApp(object):
 
     def __init__(self, stdscreen):                                           
         self.screen = stdscreen
+        self.database_manager = DatabaseManager()
         #I ran into an error here when trying to set cursur to invisible
         #this if/try makes sure that both the version of curses and the 
         #terminal support this functionality  
@@ -71,15 +72,17 @@ class MyApp(object):
             except:
                 pass
         importer = impexp(self.screen)
+
         data_items = [                                                    
                 ('Import', curses.beep),                                       
                 ('Export', importer.export)                                      
                 ]                                                            
         data = Menu(data_items, self.screen)                           
 
-        browse_database_items = [                                                    
+        browse_database_items = [
+                ('List Databases', self.display_all_databases),
                 ('Search', curses.beep),                                       
-                ('Create', curses.flash),
+                ('Create', self.create_new_database),
                 ('Copy', curses.flash),
                 ('Drop', curses.flash)                                      
                 ]                                                            
@@ -107,4 +110,56 @@ class MyApp(object):
                 ('Query',query.display)                                 
                 ]                                                            
         main_menu = Menu(main_menu_items, self.screen)                       
-        main_menu.display()                                              
+
+        main_menu.display()  
+        
+    def display_all_databases(self):   
+        parsed_dbs = []
+        databases = self.database_manager.fetch_all_databases()
+        if databases is not None:
+            for db in databases:
+                lst = list(db)
+                lst.append(curses.flash)
+                parsed_dbs.append(tuple(lst))
+            displayDatabasesMenu = Menu(parsed_dbs, self.screen)
+            displayDatabasesMenu.display()
+            
+    def create_new_database(self):
+        self.set_cursor_visible()
+        curses.echo()
+        self.display_mid("Please enter a name for the new database: ", self.screen)
+        database_name = self.screen.getstr()
+        self.screen.clear()
+        try:
+           did_create_database = self.database_manager.create_database(database_name)
+        except RuntimeError as rt_error:
+           self.display_mid("Error with the database creation query", self.screen)
+        else:
+            if did_create_database is True:
+                self.display_mid("The database " + database_name + " has been created" , self.screen)
+                self.screen.getstr()
+        self.screen.clear()
+        self.set_cursor_invisible()
+        
+    #displays message centered on screen
+    def display_mid(self, message, screen):
+        screen.clear()
+        dimensions = self.screen.getmaxyx() 
+        screen.addstr(dimensions[0]/2, dimensions[1]/2 - len(message)/2, message, curses.A_BOLD)
+        screen.refresh()
+        
+    def set_cursor_invisible(self):
+        if hasattr(curses, 'curs_set'):
+            try:
+                curses.curs_set(0)
+            except:
+                pass
+    
+    def set_cursor_visible(self):
+        if hasattr(curses, 'curs_set'):
+            try:
+                curses.curs_set(1)
+            except:
+                pass
+            
+
