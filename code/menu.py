@@ -1,4 +1,5 @@
-import curses                                                                
+import curses                                                                                                                 
+from exports import impexp
 from curses import panel
 from databaseManager import DatabaseManager                                                     
 
@@ -65,10 +66,16 @@ class MyApp(object):
         #I ran into an error here when trying to set cursur to invisible
         #this if/try makes sure that both the version of curses and the 
         #terminal support this functionality  
-        self.set_cursor_invisible()
+        if hasattr(curses, 'curs_set'):
+            try:                                            
+                curses.curs_set(0)                                                   
+            except:
+                pass
+        importer = impexp(self.screen)
+
         data_items = [                                                    
                 ('Import', curses.beep),                                       
-                ('Export', curses.flash)                                      
+                ('Export', importer.export)                                      
                 ]                                                            
         data = Menu(data_items, self.screen)                           
 
@@ -103,6 +110,7 @@ class MyApp(object):
                 ('Query',query.display)                                 
                 ]                                                            
         main_menu = Menu(main_menu_items, self.screen)                       
+
         main_menu.display()  
         
     def display_all_databases(self):   
@@ -154,3 +162,4 @@ class MyApp(object):
             except:
                 pass
             
+
