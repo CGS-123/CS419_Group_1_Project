@@ -3,7 +3,7 @@ from loginscreen import LoginScreen
 import time
 from Animators import Animators
 from menu import Menu
-from menu import MyApp
+from myApp import MyApp
 
 screen = LoginScreen()
 screen.welcome()
