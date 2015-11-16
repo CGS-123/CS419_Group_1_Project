@@ -12,12 +12,12 @@ class query:
 
     #director function
     @staticmethod
-    def query(string, db, screen = None, ISO_level = None):
+    def query(string, db, screen = None, ISO_level = None, multi_part = None):
         select = string.split(" ")
         if select[0].lower() == "select":
             return query.fetch(string, db, screen)
         else:
-            return query.execute(string, db, screen, ISO_level)
+            return query.execute(string, db, screen, ISO_level, multi_part)
 
 
     #NOTE: overloaded function,  if provided screen, will display error
@@ -25,7 +25,7 @@ class query:
     #on succes returns list of elelemts
     #on fail throws error screen and returns -1 !!Needs to be handled!!
     @staticmethod
-    def fetch(query, db, screen = None, ISO_level = None):
+    def fetch(query, db, screen = None, ISO_level = None, multi_part = None):
         
         try:
             string = "dbname=\'" + db + "\' user='vagrant' password='vagrant'"
@@ -58,7 +58,10 @@ class query:
         
         if ISO_level is not 0 or None:
             try:
-                cur.execute(query)
+                if multi_part is None:
+                    cur.execute(query)
+                else:
+                    cur.execute(query, (multi_part,))
             except:
                 if screen is not None:
                     error.throw(screen, "Error executing query.")
@@ -100,7 +103,7 @@ class query:
     #on succes returns 0
     #on fail throws error screen and returns -1 !!Needs to be handled!!
     @staticmethod
-    def execute(query, db, screen = None, ISO_level = None):
+    def execute(query, db, screen = None, ISO_level = None, multi_part = None):
     	#exceptions for debugging purposes
         try:
             string = "dbname=\'" + db + "\' user='vagrant' password='vagrant'"
@@ -132,7 +135,10 @@ class query:
                 return -1
 
         try:
-            cur.execute(query)
+            if multi_part is None:
+                cur.execute(query)
+            else:
+                cur.execute(query, (multi_part,))
         except:
             if screen is not None:
                 error.throw(screen, "Error executing query.")

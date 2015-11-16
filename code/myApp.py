@@ -3,6 +3,7 @@ from exports import impexp
 from curses import panel
 from databaseManager import DatabaseManager                                                     
 from menu import Menu
+from queryDB import queryDB
 
 class MyApp(object):                                                         
 
@@ -43,9 +44,10 @@ class MyApp(object):
         browse_table = Menu(browse_table_items, self.screen) 
 
         query_items = [                                                    
-                ('Enter Query', curses.beep),                                       
-                ('View Past Queries', curses.flash),
-                ('View Saved Queries', curses.flash)                                      
+                ('Enter A Query', self.enter_query),
+                ('Save A Query', self.save_query),                                       
+                ('View Past Queries', self.view_history),
+                ('View Saved Queries', self.view_saved)                                      
                 ]                                                            
         query = Menu(query_items, self.screen) 
 
@@ -86,6 +88,18 @@ class MyApp(object):
                 self.screen.getstr()
         self.screen.clear()
         self.set_cursor_invisible()
+
+    def view_history(self):
+        queryDB.get_history(self.screen)
+
+    def view_saved(self):
+        queryDB.get_saved(self.screen)
+
+    def enter_query(self):
+        queryDB.do(self.screen)
+
+    def save_query(self):
+        queryDB.save(self.screen)
         
     #displays message centered on screen
     def display_mid(self, message, screen):
