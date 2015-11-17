@@ -5,13 +5,14 @@ import pprint
 from Animators import Animators
 from query import query
 from error import error
+from screenmanager import ScreenManager
 
 class LoginScreen:       
     def __init__(self):
         self.username = '' #username we will store from the user input
         self.password = ''
         self.screen = curses.initscr()
-
+        self.screen_manager = ScreenManager(self.screen)
     #recursive function used to select either create account or login
     def selector(self, location):
         self.screen.keypad(1)
@@ -44,9 +45,9 @@ class LoginScreen:
 
     #function used to insert a new user into the databse:
     def create_user(self):
-        LoginScreen.display_mid(self, 'Please enter your desired Username: ')
+        self.screen_manager.display_mid('Please enter your desired Username: ')
         self.username = self.screen.getstr()
-        LoginScreen.display_mid(self, 'Please enter your desired Password: ')
+        self.screen_manager.display_mid('Please enter your desired Password: ')
         self.password = self.screen.getstr()
         curses.endwin()
 
@@ -54,20 +55,19 @@ class LoginScreen:
         rows = query.query(to_query, 'users', self.screen)
         
         if rows:
-            error.throw(self.screen, 'Username already in use.')
+            ScreenManager.throw(self.screen, 'Username already in use.')
             return LoginScreen.create_user(self)
         else:
             to_query = "INSERT INTO users (un, pw) VALUES (\'%s\', \'%s\')" % (self.username, self.password)
             if query.query(to_query, 'users', self.screen) == -1:
-                error.throw(self.screen, "An error prevented user creation.")
+                ScreenManager.throw(self.screen, "An error prevented user creation.")
                 return False
             return True
 
     def login(self):
-       
-        LoginScreen.display_mid(self, 'Please enter your Username: ')
+        self.screen_manager.display_mid('Please enter your Username: ')
         self.username = self.screen.getstr()
-        LoginScreen.display_mid(self, 'Please enter your Password: ')
+        self.screen_manager.display_mid('Please enter your Password: ')
         self.password = self.screen.getstr()
         curses.endwin()
 
@@ -79,23 +79,16 @@ class LoginScreen:
         if rows and rows != -1:
             return True
         elif rows == -1:
-            error.throw(self.screen, "Couldn't access 'users' database. Please ensure your system is set up correctly.")
+            ScreenManager.throw(self.screen, "Couldn't access 'users' database. Please ensure your system is set up correctly.")
             return False
         else:
-            error.throw(self.screen, "Incorrect Username or Password.")
+            ScreenManager.throw(self.screen, "Incorrect Username or Password.")
             return False
 
     #function that prints a flowing welcome message
     def welcome(self):
         anim = Animators()
         anim.enter_down(self.screen, "Welcome!")
-        time.sleep(1)
+        time.sleep(.25)
         anim.exit_up(self.screen, "Welcome!")
         self.screen.clear()
-
-    #displays message centered on screen
-    def display_mid(self, message):
-        self.screen.clear()
-        dimensions = self.screen.getmaxyx() 
-        self.screen.addstr(dimensions[0]/2, dimensions[1]/2 - len(message)/2, message, curses.A_BOLD)
-        self.screen.refresh()

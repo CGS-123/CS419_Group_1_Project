@@ -1,7 +1,8 @@
 import curses                                                                                                                 
 from exports import impexp
 from curses import panel
-from databaseManager import DatabaseManager                                                     
+from databaseManager import DatabaseManager   
+from screenmanager import ScreenManager                                                  
 from menu import Menu
 from queryDB import queryDB
 
@@ -10,6 +11,7 @@ class MyApp(object):
     def __init__(self, stdscreen):                                           
         self.screen = stdscreen
         self.database_manager = DatabaseManager()
+        self.screen_manager = ScreenManager(self.screen)
         #I ran into an error here when trying to set cursur to invisible
         #this if/try makes sure that both the version of curses and the 
         #terminal support this functionality  
@@ -75,16 +77,16 @@ class MyApp(object):
     def create_new_database(self):
         self.set_cursor_visible()
         curses.echo()
-        self.display_mid("Please enter a name for the new database: ", self.screen)
+        self.screen_manager.display_mid("Please enter a name for the new database: ")
         database_name = self.screen.getstr()
         self.screen.clear()
         try:
            did_create_database = self.database_manager.create_database(database_name)
         except RuntimeError as rt_error:
-           self.display_mid("Error with the database creation query", self.screen)
+           self.screen_manager.display_mid("Error with the database creation query")
         else:
             if did_create_database is True:
-                self.display_mid("The database " + database_name + " has been created" , self.screen)
+                self.screen_manager.display_mid("The database " + database_name + " has been created")
                 self.screen.getstr()
         self.screen.clear()
         self.set_cursor_invisible()
@@ -101,12 +103,6 @@ class MyApp(object):
     def save_query(self):
         queryDB.save(self.screen)
         
-    #displays message centered on screen
-    def display_mid(self, message, screen):
-        screen.clear()
-        dimensions = self.screen.getmaxyx() 
-        screen.addstr(dimensions[0]/2, dimensions[1]/2 - len(message)/2, message, curses.A_BOLD)
-        screen.refresh()
         
     def set_cursor_invisible(self):
         if hasattr(curses, 'curs_set'):
