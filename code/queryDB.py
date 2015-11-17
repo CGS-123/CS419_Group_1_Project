@@ -81,6 +81,7 @@ class queryDB:
         selector = 0
         while selector != ord('\n'):
             j = 0
+            i = 0
             for i in range(len(data)):
                 if i + j + len(data[i][0])//dim[1] + 1 > dim[0]:
                     i = i - 1
@@ -91,6 +92,9 @@ class queryDB:
                     screen.addstr(i + j, 0, data[i][0], curses.A_DIM)
                 if dim[1] < len(data[i][0]):
                     j += len(data[i][0])//dim[1]
+            if i == 0:
+                error.throw(screen, "No queries available.")
+                return
             screen.refresh()
             selector = screen.getch()
             screen.clear()
