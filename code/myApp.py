@@ -8,7 +8,6 @@ class MyApp(object):
 
     def __init__(self, stdscreen):                                           
         self.screen = stdscreen
-        self.database_manager = DatabaseManager()
         #I ran into an error here when trying to set cursur to invisible
         #this if/try makes sure that both the version of curses and the 
         #terminal support this functionality  
@@ -18,6 +17,7 @@ class MyApp(object):
             except:
                 pass
         importer = impexp(self.screen)
+        db_manager = DatabaseManager(self.screen)
 
         data_items = [                                                    
                 ('Import', importer.list_sql_files),                                       
@@ -26,10 +26,9 @@ class MyApp(object):
         data = Menu(data_items, self.screen)                           
 
         browse_database_items = [
-                ('List Databases', self.display_all_databases),
-                ('Search', curses.beep),                                       
-                ('Create', self.create_new_database),
-                ('Copy', curses.flash),
+                ('List Databases', db_manager.display_all_databases),                                      
+                ('Create', db_manager.create_new_database),
+                ('Copy', db_manager.display_all_copy_database),
                 ('Drop', curses.flash)                                      
                 ]                                                            
         browse_database = Menu(browse_database_items, self.screen) 
@@ -58,35 +57,6 @@ class MyApp(object):
         main_menu = Menu(main_menu_items, self.screen)                       
 
         main_menu.display()  
-        
-    def display_all_databases(self):   
-        parsed_dbs = []
-        databases = self.database_manager.fetch_all_databases()
-        if databases is not None:
-            for db in databases:
-                lst = list(db)
-                lst.append(curses.flash)
-                parsed_dbs.append(tuple(lst))
-            displayDatabasesMenu = Menu(parsed_dbs, self.screen)
-            displayDatabasesMenu.display()
-            
-    def create_new_database(self):
-        self.set_cursor_visible()
-        curses.echo()
-        self.display_mid("Please enter a name for the new database: ", self.screen)
-        database_name = self.screen.getstr()
-        self.screen.clear()
-        try:
-           did_create_database = self.database_manager.create_database(database_name)
-        except RuntimeError as rt_error:
-           self.display_mid("Error with the database creation query", self.screen)
-        else:
-            if did_create_database is True:
-                self.display_mid("The database " + database_name + " has been created" , self.screen)
-                self.screen.getstr()
-        self.screen.clear()
-        self.set_cursor_invisible()
-        
     #displays message centered on screen
     def display_mid(self, message, screen):
         screen.clear()
