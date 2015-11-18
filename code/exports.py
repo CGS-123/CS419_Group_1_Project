@@ -6,6 +6,7 @@ import psycopg2
 from query import query
 from menu import Menu
 from error import error
+
 class impexp(object):
     def __init__(self, stdscreen):
         self.screen = stdscreen
