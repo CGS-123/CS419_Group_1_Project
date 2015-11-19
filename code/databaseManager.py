@@ -50,26 +50,75 @@ class DatabaseManager(object):
         if databases is not None:
             for db in databases:
                 lst = list(db)
-                lst.append(self.copy_database(db[0]))
+                lst.append(self.copy_database)
+                lst.append(db)
+                parsed_dbs.append(tuple(lst))
+            displayDatabasesMenu = Menu(parsed_dbs, self.screen)
+            displayDatabasesMenu.display()
+    
+    def display_all_delete_database(self):   
+        parsed_dbs = []
+        databases = self.fetch_all_databases()
+        if databases is not None:
+            for db in databases:
+                lst = list(db)
+                lst.append(self.drop_database)
+                lst.append(db)
                 parsed_dbs.append(tuple(lst))
             displayDatabasesMenu = Menu(parsed_dbs, self.screen)
             displayDatabasesMenu.display()
             
     def copy_database(self, database):
-        self.screen_manager.display_mid(database, self.screen)
+        db_name = database[0]
+        
+        self.screen_manager.set_cursor_visible()
+        curses.echo()
+        self.screen_manager.display_mid("Please enter a name for the new database: ")
+        new_db_name = self.screen_manager.screen.getstr()
+        self.screen.clear()
+        
+        db_copy_query = "CREATE DATABASE " + new_db_name + " WITH TEMPLATE " + db_name
+        if query.query(db_copy_query, 'postgres', self.screen, 0) == -1:
+            ScreenManager.throw(self.screen, "An error prevented database creation.")
+        else:
+            self.screen_manager.display_mid("The database " + new_db_name + " has been copied from" + db_name)
+            self.screen.getstr()
+        self.screen.clear()
+        self.screen_manager.set_cursor_invisible()
+        
+    def drop_database(self, database):
+        db_name = database[0]
+        
+        self.screen_manager.set_cursor_visible()
+        curses.echo()
+        self.screen_manager.display_mid("Are you sure you want to delete " + db_name + "? (Y/N): ")
+        confirmation = self.screen_manager.screen.getstr()
+        if confirmation == 'Y':
+            db_delete_query = "DROP DATABASE " + db_name
+            if query.query(db_delete_query, 'postgres', self.screen, 0) == -1:
+                ScreenManager.throw(self.screen, "An error prevented database creation.")
+            else:
+                self.screen_manager.display_mid("The database " + db_name + " has been deleted")
+                self.screen.getstr()
+        else:
+            self.screen_manager.display_mid(db_name + " will not be deleted")
+            self.screen_manager.screen.getstr()
+        self.screen.clear()
+        self.screen_manager.set_cursor_invisible()            
     
     def create_new_database(self):
         self.screen_manager.set_cursor_visible()
-        self.screen_manager.display_mid("Please enter a name for the new database: ", self.screen)
-        database_name = self.screen.getstr()
+        curses.echo()
+        self.screen_manager.display_mid("Please enter a name for the new database: ")
+        database_name = self.screen_manager.screen.getstr()
         self.screen.clear()
         try:
            did_create_database = self.create_database(database_name)
         except RuntimeError as rt_error:
-           self.screen_manager.display_mid("Error with the database creation query", self.screen)
+           self.screen_manager.display_mid("Error with the database creation query")
         else:
             if did_create_database is True:
-                self.display_mid("The database " + database_name + " has been created" , self.screen)
+                self.screen_manager.display_mid("The database " + database_name + " has been created")
                 self.screen.getstr()
         self.screen.clear()
         self.screen_manager.set_cursor_invisible()
