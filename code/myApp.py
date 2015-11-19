@@ -39,7 +39,7 @@ class MyApp(object):
         browse_database = Menu(browse_database_items, self.screen) 
 
         browse_table_items = [
-                ('List Tables', self.table_manager.listTables),                                                    
+                ('List Tables', self.database_manager.display_all_databases_opt, self.table_manager.listTables),                                                    
                 ('Create', curses.beep),                                       
                 ('Delete', curses.flash),
                 ('Copy', curses.flash),

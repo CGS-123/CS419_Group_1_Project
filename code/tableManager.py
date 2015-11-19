@@ -14,15 +14,15 @@ class TableManager(object):
         self.screen_manager = ScreenManager(self.screen)
         self.db_mgr = DatabaseManager(self.screen)
 
+    def listTables(self, dbname):
 
-    def listTables(self):
         query = """
         SELECT table_name
         FROM information_schema.tables
         where table_schema = 'public'
         """
         #make connection between python and postgresql
-        conn = psycopg2.connect("dbname='worlddb' user='vagrant' password='vagrant'")
+        conn = psycopg2.connect("dbname='"+dbname+"' user='vagrant' password='vagrant'")
         cur = conn.cursor()
 
         cur.execute(query)
