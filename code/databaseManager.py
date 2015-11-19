@@ -81,7 +81,7 @@ class DatabaseManager(object):
         if query.query(db_copy_query, 'postgres', self.screen, 0) == -1:
             ScreenManager.throw(self.screen, "An error prevented database creation.")
         else:
-            self.screen_manager.display_mid("The database " + new_db_name + " has been copied from" + db_name)
+            self.screen_manager.display_mid("The database " + new_db_name + " has been copied from " + db_name)
             self.screen.getstr()
         self.screen.clear()
         self.screen_manager.set_cursor_invisible()
