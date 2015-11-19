@@ -2,7 +2,8 @@ import curses
 from exports import impexp
 from curses import panel
 from databaseManager import DatabaseManager   
-from screenmanager import ScreenManager                                                  
+from screenmanager import ScreenManager   
+from tableManager import TableManager                                               
 from menu import Menu
 from queryDB import queryDB
 
@@ -12,6 +13,7 @@ class MyApp(object):
         self.screen = stdscreen
         self.database_manager = DatabaseManager(self.screen)
         self.screen_manager = ScreenManager(self.screen)
+        self.table_manager = TableManager(self.screen)
         #I ran into an error here when trying to set cursur to invisible
         #this if/try makes sure that both the version of curses and the 
         #terminal support this functionality  
@@ -36,7 +38,8 @@ class MyApp(object):
                 ]                                                            
         browse_database = Menu(browse_database_items, self.screen) 
 
-        browse_table_items = [                                                    
+        browse_table_items = [
+                ('List Tables', self.table_manager.listTables),                                                    
                 ('Create', curses.beep),                                       
                 ('Delete', curses.flash),
                 ('Copy', curses.flash),
