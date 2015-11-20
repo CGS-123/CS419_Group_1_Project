@@ -56,7 +56,7 @@ class impexp(object):
     def import_sql(self, options):
         file = options['file']
         dbname = options['dbname']
-        conn = psycopg2.connect("dbname='worlddb' user='vagrant' password='vagrant'")
+        conn = psycopg2.connect("dbname='"+dbname+"' user='vagrant' password='vagrant'")
         cur = conn.cursor()
         cur.execute(open(file, "r").read())
         message = "Import of "+ file +" successful!!"
