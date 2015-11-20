@@ -10,7 +10,7 @@ from error import error
 class impexp(object):
     def __init__(self, stdscreen):
         self.screen = stdscreen
-    def export(self):
+    def export(self, dbname):
         query = """
         SELECT table_name
         FROM information_schema.tables
@@ -18,7 +18,7 @@ class impexp(object):
         """
 
         #make connection between python and postgresql
-        conn = psycopg2.connect("dbname='worlddb' user='vagrant' password='vagrant'")
+        conn = psycopg2.connect("dbname='"+dbname+"' user='vagrant' password='vagrant'")
         cur = conn.cursor()
 
         cur.execute(query)

@@ -26,7 +26,7 @@ class MyApp(object):
 
         data_items = [                                                    
                 ('Import', importer.list_sql_files),                                       
-                ('Export', importer.export)                                      
+                ('Export', self.database_manager.display_all_databases_opt, importer.export)                                      
                 ]                                                            
         data = Menu(data_items, self.screen)                           
 
