@@ -5,28 +5,17 @@ from error import error
 from menu import Menu
 from screenmanager import ScreenManager
 from databaseManager import DatabaseManager
+from query import query
 
 class TableManager(object):
     def __init__(self,stdscreen):
         self.screen = stdscreen
-        self.screen = stdscreen
         self.dimensions = self.screen.getmaxyx() 
         self.screen_manager = ScreenManager(self.screen)
-        self.db_mgr = DatabaseManager(self.screen)
 
     def listTables(self, dbname):
-
-        query = """
-        SELECT table_name
-        FROM information_schema.tables
-        where table_schema = 'public'
-        """
-        #make connection between python and postgresql
-        conn = psycopg2.connect("dbname='"+dbname+"' user='vagrant' password='vagrant'")
-        cur = conn.cursor()
-
-        cur.execute(query)
-        rows = cur.fetchall()
+        table_query = "SELECT table_name FROM information_schema.tables where table_schema = 'public'"
+        rows = query.query(table_query, dbname, self.screen)
         parsed_table_menu = []
         for datas in rows:
             lst = (str(datas[0]),curses.flash)
