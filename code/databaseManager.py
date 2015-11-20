@@ -43,6 +43,17 @@ class DatabaseManager(object):
                 parsed_dbs.append(tuple(lst))
             displayDatabasesMenu = Menu(parsed_dbs, self.screen)
             displayDatabasesMenu.display()
+
+    #Display methods
+    def display_all_databases_opt(self, option):   
+        parsed_dbs = []
+        databases = self.fetch_all_databases()
+        if databases is not None:
+            for db in databases:
+                lst = (str(db[0]),option,str(db[0]))
+                parsed_dbs.append(tuple(lst))
+            displayDatabasesMenu = Menu(parsed_dbs, self.screen)
+            displayDatabasesMenu.display()
     
     def display_all_copy_database(self):   
         parsed_dbs = []
