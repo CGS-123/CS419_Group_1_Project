@@ -36,14 +36,15 @@ class impexp(object):
         dimensions = self.screen.getmaxyx() 
         self.screen.addstr(dimensions[0]/2, dimensions[1]/2 - len(message)/2, message, curses.A_BOLD)
     
-    def list_sql_files(self):
+    def list_sql_files(self, dbname):
         top = os.getcwd()
         dir = os.listdir(top)
         parsed_file = []
         count = 0
         for f in dir:
             if fnmatch.fnmatch(f, '*.sql'):
-                lst = (str(f), self.import_sql, str(f))
+                myOpt = {'dbname':dbname,'file':str(f)}
+                lst = (str(f), self.import_sql, myOpt)
                 parsed_file.append(tuple(lst))
                 count = 1
         if count == 1:
@@ -52,7 +53,9 @@ class impexp(object):
         else:
             error.throw(self.screen, "No .sql files")
 
-    def import_sql(self, file):
+    def import_sql(self, options):
+        file = options['file']
+        dbname = options['dbname']
         conn = psycopg2.connect("dbname='worlddb' user='vagrant' password='vagrant'")
         cur = conn.cursor()
         cur.execute(open(file, "r").read())

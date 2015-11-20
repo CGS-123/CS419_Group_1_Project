@@ -23,9 +23,8 @@ class MyApp(object):
             except:
                 pass
         importer = impexp(self.screen)
-
         data_items = [                                                    
-                ('Import', importer.list_sql_files),                                       
+                ('Import', self.database_manager.display_all_databases_opt, importer.list_sql_files),                                       
                 ('Export', self.database_manager.display_all_databases_opt, importer.export)                                      
                 ]                                                            
         data = Menu(data_items, self.screen)                           
