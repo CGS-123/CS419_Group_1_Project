@@ -45,12 +45,12 @@ class DatabaseManager(object):
             displayDatabasesMenu.display()
 
     #Display methods
-    def display_all_databases_opt(self, option):   
+    def display_all_databases_opt(self, action):   
         parsed_dbs = []
         databases = self.fetch_all_databases()
         if databases is not None:
             for db in databases:
-                lst = (str(db[0]),option,str(db[0]))
+                lst = (str(db[0]),action,str(db[0]))
                 parsed_dbs.append(tuple(lst))
             displayDatabasesMenu = Menu(parsed_dbs, self.screen)
             displayDatabasesMenu.display()

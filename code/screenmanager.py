@@ -23,6 +23,10 @@ class ScreenManager:
         self.screen.addstr(dimensions[0]/2, dimensions[1]/2 - len(message)/2, message, curses.A_BOLD)
         self.screen.refresh()
 
+    def display_top_center(self, message):
+        dimensions = self.screen.getmaxyx()
+        self.screen.addstr(dimensions[0]/2, dimensions[1]/2 - len(message)/2, message, curses.A_BOLD)
+        self.screen.refresh()        
 
     #function that prints a flowing welcome message
     def welcome(self):
