@@ -4,79 +4,77 @@ from psycopg2 import extras
 from query import query
 from error import error
 
-# NOTE: saved/historical queries that would go off the screen are not 
+# NOTE: saved/historical queries that would go off the self.screen are not 
 # displayed and are not selectable. They are displayed in a stack 
 # style with the most recent saved/run queries displayed in a list.
 # However, these queries are still saved/recoreded and can be accessed
 # by querying the queries db manually.
 
 class queryDB:
+    def __init__(self, screen):
+        self.screen = screen
 
-    @staticmethod
-    def do(screen):
+
+    def do(self):
       ###good spot to put a "users member" variable for current db instead of worlddb
         currentDB = 'worlddb'
-        screen.clear()
-        queryDB.display_top_left("Please enter a query to execute below:\n", screen)
+        self.screen.clear()
+        queryDB.display_top_left(self, "Please enter a query to execute below:\n")
         curses.echo()
-        string = screen.getstr()
+        string = self.screen.getstr()
         
-        queryDB.run(string, currentDB, screen)
+        queryDB.run(self, string, currentDB)
 
 
-    @staticmethod
-    def save(screen):
+    def save(self):
       ###good spot to put a "users member" variable for current db instead of worlddb
         currentDB = 'worlddb'
-        screen.clear()
-        queryDB.display_top_left("Please enter a query save below:\n", screen)
+        self.screen.clear()
+        queryDB.display_top_left(self, "Please enter a query save below:\n")
         curses.echo()
-        string = screen.getstr()
+        string = self.screen.getstr()
         q = "INSERT INTO queries_saved (query) VALUES (%s)"
         query.query(q, 'queries', None, None, string)
-        screen.clear()
+        self.screen.clear()
         
 
-    @staticmethod
-    def get_history(screen):
+    def get_history(self):
       ###good spot to put a "users member" variable for current db instead of worlddb
         currentDB = 'worlddb'
         history = query.query('SELECT query FROM queries_history ORDER BY id DESC LIMIT 100', 'queries')
-        queryDB.display(screen, history, currentDB)
+        queryDB.display(self, history, currentDB)
         
 
-    @staticmethod
-    def get_saved(screen):
+    def get_saved(self):
       ###good spot to put a "users member" variable for current db instead of worlddb
         currentDB = 'worlddb'
         saved = query.query('SELECT query FROM queries_saved ORDER BY id DESC LIMIT 100', 'queries')
-        queryDB.display(screen, saved, currentDB)
+        queryDB.display(self, saved, currentDB)
                 
 
-    @staticmethod
-    def run(string, currentDB, screen):
-        result = query.query(string, currentDB, screen)
+    def run(self, string, currentDB):
+        result = query.query(string, currentDB, self.screen)
         if result == -1:
-            error.throw(screen, "The query did not succeed.")
-            screen.clear()
+            error.throw(self.screen, "The query did not succeed.")
+            self.screen.clear()
         elif result == 0:
-            error.throw(screen, "The query was succesful.")
-            screen.clear()
+            error.throw(self.screen, "The query was succesful.")
+            self.screen.clear()
             q = "INSERT INTO queries_history (query) VALUES (%s)"
             query.query(q, 'queries', None, None, string)
         else:
-            screen.clear()
-            queryDB.display_top_left(str(result), screen)
-            screen.getch()
-            screen.clear()
+            self.screen.clear()
+            queryDB.display_top_left(self, str(result))
+            self.screen.getch()
+            self.screen.clear()
             q = "INSERT INTO queries_history (query) VALUES (%s)"
             query.query(q, 'queries', None, None, string)
 
-    @staticmethod
-    def display(screen, data, currentDB):
-        dim = screen.getmaxyx()
-        screen.clear()
-        screen.keypad(1)
+
+    def display(self, data, currentDB):
+        dim = self.screen.getmaxyx()
+        self.screen.clear()
+        self.screen.keypad(1)
         k = 0
         selector = 0
         while selector != ord('\n'):
@@ -87,28 +85,28 @@ class queryDB:
                     i = i - 1
                     break
                 if k == i:
-                    screen.addstr(i + j, 0, data[i][0], curses.A_STANDOUT)
+                    self.screen.addstr(i + j, 0, data[i][0], curses.A_STANDOUT)
                 else:
-                    screen.addstr(i + j, 0, data[i][0], curses.A_DIM)
+                    self.screen.addstr(i + j, 0, data[i][0], curses.A_DIM)
                 if dim[1] < len(data[i][0]):
                     j += len(data[i][0])//dim[1]
             if i == 0:
-                error.throw(screen, "No queries available.")
+                error.throw(self.screen, "No queries available.")
+                self.screen.clear()
                 return
-            screen.refresh()
-            selector = screen.getch()
-            screen.clear()
+            self.screen.refresh()
+            selector = self.screen.getch()
+            self.screen.clear()
             if selector == curses.KEY_UP:
                 if k > 0:
                     k = k - 1
             if selector == curses.KEY_DOWN:
                 if k < i:
                     k = k + 1
-        queryDB.run(data[k][0], currentDB, screen)
+        queryDB.run(self, data[k][0], currentDB)
 
 
-    @staticmethod
-    def display_top_left(message, screen):
-        screen.addstr(0, 0, message, curses.A_BOLD)
-        screen.refresh()
+    def display_top_left(self, message):
+        self.screen.addstr(0, 0, message, curses.A_BOLD)
+        self.screen.refresh()
 
