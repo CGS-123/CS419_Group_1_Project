@@ -28,7 +28,7 @@ class query:
     def fetch(query, db, screen = None, ISO_level = None, multi_part = None):
         
         try:
-            string = "dbname=\'" + db + "\' user='vagrant' password='vagrant'"
+            string = "dbname=\'" + db + "\' user='root1' password='root1'"
             conn = psycopg2.connect(string)
         except:
             if screen is not None:
@@ -176,3 +176,5 @@ class query:
                 return -1
 
         return 0
+
+print query.fetchfaE("Select * from city where id=1", 'worlddb')

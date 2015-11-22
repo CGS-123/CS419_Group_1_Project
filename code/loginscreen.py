@@ -6,6 +6,7 @@ from Animators import Animators
 from query import query
 from error import error
 from screenmanager import ScreenManager
+from subprocess import call
 
 class LoginScreen:       
     def __init__(self):
@@ -51,14 +52,14 @@ class LoginScreen:
         self.password = self.screen.getstr()
         curses.endwin()
 
-        to_query = "SELECT * FROM users WHERE un LIKE \'%s\'" % self.username
+        to_query = "SELECT * FROM pg_catalog.pg_roles WHERE rolname LIKE \'%s\'" % self.username
         rows = query.query(to_query, 'users', self.screen)
         
         if rows:
             ScreenManager.throw(self.screen, 'Username already in use.')
             return LoginScreen.create_user(self)
         else:
-            to_query = "INSERT INTO users (un, pw) VALUES (\'%s\', \'%s\')" % (self.username, self.password)
+            to_query = "CREATE USER %s WITH CREATEDB PASSWORD \'%s\'" % (self.username, self.password)
             if query.query(to_query, 'users', self.screen) == -1:
                 ScreenManager.throw(self.screen, "An error prevented user creation.")
                 return False
