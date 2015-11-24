@@ -44,7 +44,7 @@ class tableDisplay:
     #x and y represent top left of screen relative to entire datatable
     @staticmethod
     def organize(data, x, y, screen):
-        dim = (25, 80)
+        dim = screen.getmaxyx()
         active = list()
         max_array = list()
         for i in range(len(data[0])):
