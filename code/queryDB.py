@@ -3,6 +3,7 @@ import psycopg2
 from psycopg2 import extras
 from query import query
 from error import error
+from tableDisplay import tableDisplay
 
 # NOTE: saved/historical queries that would go off the self.screen are not 
 # displayed and are not selectable. They are displayed in a stack 
@@ -64,8 +65,7 @@ class queryDB:
             query.query(q, 'queries', None, None, string)
         else:
             self.screen.clear()
-            queryDB.display_top_left(self, str(result))
-            self.screen.getch()
+            tableDisplay.navigate(result, 0, 0, self.screen)
             self.screen.clear()
             q = "INSERT INTO queries_history (query) VALUES (%s)"
             query.query(q, 'queries', None, None, string)
@@ -80,16 +80,16 @@ class queryDB:
         while selector != ord('\n'):
             j = 0
             i = 0
-            for i in range(len(data)):
-                if i + j + len(data[i][0])//dim[1] + 1 > dim[0]:
+            for i in range(len(data[1])):
+                if i + j + len(data[1][i][0])//dim[1] + 1 > dim[0]:
                     i = i - 1
                     break
                 if k == i:
-                    self.screen.addstr(i + j, 0, data[i][0], curses.A_STANDOUT)
+                    self.screen.addstr(i + j, 0, data[1][i][0], curses.A_STANDOUT)
                 else:
-                    self.screen.addstr(i + j, 0, data[i][0], curses.A_DIM)
-                if dim[1] < len(data[i][0]):
-                    j += len(data[i][0])//dim[1]
+                    self.screen.addstr(i + j, 0, data[1][i][0], curses.A_DIM)
+                if dim[1] < len(data[1][i][0]):
+                    j += len(data[1][i][0])//dim[1]
             if i == 0:
                 error.throw(self.screen, "No queries available.")
                 self.screen.clear()
@@ -103,7 +103,7 @@ class queryDB:
             if selector == curses.KEY_DOWN:
                 if k < i:
                     k = k + 1
-        queryDB.run(self, data[k][0], currentDB)
+        queryDB.run(self, data[1][k][0], currentDB)
 
 
     def display_top_left(self, message):

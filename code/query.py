@@ -80,6 +80,7 @@ class query:
                     return -1
 
         try:
+            cols = [desc[0] for desc in cur.description]
             rows = cur.fetchall()
         except:
             if screen is not None:
@@ -106,7 +107,7 @@ class query:
             else:
                 return -1
         
-        return rows
+        return (cols, rows)
 
     #NOTE: overloaded function,  if provided screen, will display error
     #method used to return any values from a database given a string query
