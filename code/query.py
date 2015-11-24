@@ -12,12 +12,12 @@ class query:
 
     #director function
     @staticmethod
-    def query(string, db, screen = None, ISO_level = None, multi_part = None):
+    def query(string, db, screen = None, ISO_level = None, multi_part = None, username = None, password = None):
         select = string.split(" ")
         if select[0].lower() == "select":
-            return query.fetch(string, db, screen)
+            return query.fetch(string, db, screen, ISO_level, multi_part, username, password)
         else:
-            return query.execute(string, db, screen, ISO_level, multi_part)
+            return query.execute(string, db, screen, ISO_level, multi_part, username, password)
 
 
     #NOTE: overloaded function,  if provided screen, will display error
@@ -25,17 +25,27 @@ class query:
     #on succes returns list of elelemts
     #on fail throws error screen and returns -1 !!Needs to be handled!!
     @staticmethod
-    def fetch(query, db, screen = None, ISO_level = None, multi_part = None):
-        
-        try:
-            string = "dbname=\'" + db + "\' user='root1' password='root1'"
-            conn = psycopg2.connect(string)
-        except:
-            if screen is not None:
-                error.throw(screen, "Error to connecting to \'" + db + "\' database.")
-                return -1
-            else:
-                return -1
+    def fetch(query, db, screen = None, ISO_level = None, multi_part = None, username = None, password = None):
+        if username is None:
+            try:
+                string = "dbname=\'" + db + "\' user='vagrant' password='vagrant'"
+                conn = psycopg2.connect(string)
+            except:
+                if screen is not None:
+                    error.throw(screen, "Error to connecting to \'" + db + "\' database.")
+                    return -1
+                else:
+                    return -1
+        else:
+            try:
+                string = "dbname=\'" + db + "\' user=\'" + username + "\' password=\'" + password + "\'"
+                conn = psycopg2.connect(string)
+            except:
+                if screen is not None:
+                    error.throw(screen, "Error to connecting to \'" + db + "\' database.")
+                    return -2
+                else:
+                    return -2
 
         if ISO_level is not None:
             try:
@@ -103,17 +113,28 @@ class query:
     #on succes returns 0
     #on fail throws error screen and returns -1 !!Needs to be handled!!
     @staticmethod
-    def execute(query, db, screen = None, ISO_level = None, multi_part = None):
+    def execute(query, db, screen = None, ISO_level = None, multi_part = None, username = None, password = None):
     	#exceptions for debugging purposes
-        try:
-            string = "dbname=\'" + db + "\' user='vagrant' password='vagrant'"
-            conn = psycopg2.connect(string)
-        except:
-            if screen is not None:
-                error.throw(screen, "Error to connecting to \'" + db + "\' database.")
-                return -1
-            else:
-                return -1
+        if username is None:
+            try:
+                string = "dbname=\'" + db + "\' user='vagrant' password='vagrant'"
+                conn = psycopg2.connect(string)
+            except:
+                if screen is not None:
+                    error.throw(screen, "Error to connecting to \'" + db + "\' database.")
+                    return -1
+                else:
+                    return -1
+        else:
+            try:
+                string = "dbname=\'" + db + "\' user=\'" + username + "\' password=\'" + password + "\'"
+                conn = psycopg2.connect(string)
+            except:
+                if screen is not None:
+                    error.throw(screen, "Error to connecting to \'" + db + "\' database.")
+                    return -2
+                else:
+                    return -2
 
         if ISO_level is not None:
             try:
@@ -176,5 +197,3 @@ class query:
                 return -1
 
         return 0
-
-print query.fetchfaE("Select * from city where id=1", 'worlddb')

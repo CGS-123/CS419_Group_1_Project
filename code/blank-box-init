@@ -12,11 +12,13 @@ sudo sed -ibk \
     -re "s/[#]*listen_addresses = '.*'(.*)/listen_addresses = '*'\1/" \
     /etc/postgresql/9.3/main/postgresql.conf
 echo "host    all   vagrant   10.0.2.2/32  trust" | sudo tee -a /etc/postgresql/9.3/main/pg_hba.conf
+sudo sed -i '90s/.*/local   all             all                                     trust/' /etc/postgresql/9.3/main/pg_hba.conf
 sudo service postgresql restart
 su -c 'createdb vagrant' vagrant
 su -c "psql -c 'create table a (a json);'" vagrant
 su -c "psql -c 'create database worlddb;'" vagrant
 su -c "psql worlddb < /vagrant/world.sql" vagrant
+su -c "psql -c 'create database root_default;'" vagrant
 su -c "psql vagrant < /vagrant/users.sql" vagrant
 su -c "psql -c 'create database queries;'" vagrant
 su -c "psql queries < /vagrant/queries.sql" vagrant
