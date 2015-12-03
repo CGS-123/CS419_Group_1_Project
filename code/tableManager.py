@@ -17,7 +17,7 @@ class TableManager(object):
         table_query = "SELECT table_name FROM information_schema.tables where table_schema = 'public'"
         rows = query.query(table_query, dbname, self.screen)
         parsed_table_menu = []
-        for datas in rows:
+        for datas in rows[1]:
             lst = (str(datas[0]),curses.flash)
             parsed_table_menu.append(tuple(lst))
         table_menu = Menu(parsed_table_menu,self.screen)

@@ -14,6 +14,7 @@ class MyApp(object):
         self.database_manager = DatabaseManager(self.screen)
         self.screen_manager = ScreenManager(self.screen)
         self.table_manager = TableManager(self.screen)
+        self.query_manager = queryDB(self.screen)
         #I ran into an error here when trying to set cursur to invisible
         #this if/try makes sure that both the version of curses and the 
         #terminal support this functionality  
@@ -47,10 +48,10 @@ class MyApp(object):
         browse_table = Menu(browse_table_items, self.screen) 
 
         query_items = [                                                    
-                ('Enter A Query', self.enter_query),
-                ('Save A Query', self.save_query),                                       
-                ('View Past Queries', self.view_history),
-                ('View Saved Queries', self.view_saved)                                      
+                ('Enter A Query', self.database_manager.display_all_databases_opt, self.query_manager.do),
+                ('Save A Query', self.query_manager.save),                                       
+                ('View Past Queries', self.database_manager.display_all_databases_opt, self.query_manager.get_history),
+                ('View Saved Queries', self.database_manager.display_all_databases_opt, self.query_manager.get_saved)                                      
                 ]                                                            
         query = Menu(query_items, self.screen) 
 
@@ -62,20 +63,7 @@ class MyApp(object):
                 ]                                                            
         main_menu = Menu(main_menu_items, self.screen)                       
 
-        main_menu.display()  
-
-    def view_history(self):
-        queryDB.get_history(self.screen)
-
-    def view_saved(self):
-        queryDB.get_saved(self.screen)
-
-    def enter_query(self):
-        queryDB.do(self.screen)
-
-    def save_query(self):
-        queryDB.save(self.screen)
-        
+        main_menu.display()          
         
     def set_cursor_invisible(self):
         if hasattr(curses, 'curs_set'):

@@ -6,6 +6,7 @@ from Animators import Animators
 from query import query
 from error import error
 from screenmanager import ScreenManager
+from subprocess import call
 
 class LoginScreen:       
     def __init__(self):
@@ -49,19 +50,27 @@ class LoginScreen:
         self.username = self.screen.getstr()
         self.screen_manager.display_mid('Please enter your desired Password: ')
         self.password = self.screen.getstr()
-        curses.endwin()
 
-        to_query = "SELECT * FROM users WHERE un LIKE \'%s\'" % self.username
-        rows = query.query(to_query, 'users', self.screen)
+        to_query = "SELECT * FROM pg_catalog.pg_roles WHERE rolname LIKE \'%s\'" % self.username
+        rows = query.query(to_query, 'postgres', self.screen)
         
-        if rows:
+        if rows[1]:
             ScreenManager.throw(self.screen, 'Username already in use.')
             return LoginScreen.create_user(self)
         else:
-            to_query = "INSERT INTO users (un, pw) VALUES (\'%s\', \'%s\')" % (self.username, self.password)
-            if query.query(to_query, 'users', self.screen) == -1:
+            to_query = "CREATE USER %s WITH CREATEDB PASSWORD \'%s\'" % (self.username, self.password)
+            if query.query(to_query, 'postgres', self.screen) == -1:
                 ScreenManager.throw(self.screen, "An error prevented user creation.")
                 return False
+            to_query = "CREATE DATABASE %s_default" % (self.username)
+            if query.query(to_query, 'postgres', self.screen, 0) == -1:
+                ScreenManager.throw(self.screen, "An error occured during user default database creation.")
+                return False
+            to_query = "ALTER DATABASE %s_default owner to %s" % (self.username, self.username)
+            if query.query(to_query, 'postgres', self.screen) == -1:
+                ScreenManager.throw(self.screen, "An error occured while assigning new user to default database.")
+                return False
+
             return True
 
     def login(self):
@@ -69,17 +78,16 @@ class LoginScreen:
         self.username = self.screen.getstr()
         self.screen_manager.display_mid('Please enter your Password: ')
         self.password = self.screen.getstr()
-        curses.endwin()
 
 
         #query the database and check if name and password are correct
-        to_query = "SELECT * FROM users WHERE un LIKE \'%s\' AND pw LIKE \'%s\'" % (self.username, self.password)
-        rows = query.query(to_query, 'users', self.screen)
+        to_query = "SELECT * FROM pg_catalog.pg_roles WHERE rolname LIKE \'root\'"
+        rows = query.query(to_query, 'postgres', None, None, None, self.username, self.password)
         
-        if rows and rows != -1:
+        if rows != -1 and rows != -2:
             return True
         elif rows == -1:
-            ScreenManager.throw(self.screen, "Couldn't access 'users' database. Please ensure your system is set up correctly.")
+            ScreenManager.throw(self.screen, "Couldn't sign in. Please ensure your system is set up correctly.")
             return False
         else:
             ScreenManager.throw(self.screen, "Incorrect Username or Password.")

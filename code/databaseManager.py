@@ -17,12 +17,12 @@ class DatabaseManager(object):
     #Database query methods
     def fetch_all_databases(self):
         databases = query.query(self.all_databases_query, 'postgres', self.screen)
-        return databases
+        return databases[1]
         
     def create_database(self, name):
         to_query = "SELECT 1 FROM pg_database WHERE datname = \'%s\'" % (name)
         database_exists = query.query(to_query, 'postgres', self.screen)
-        if database_exists:
+        if database_exists[1]:
             ScreenManager.throw(self.screen, 'Database already exists.')
             return False
         else:

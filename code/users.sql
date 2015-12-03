@@ -2,15 +2,7 @@ BEGIN;
 
 SET client_encoding = 'LATIN1';
 
-CREATE TABLE users (
-	id SERIAL PRIMARY KEY,
-	un text,
-	pw text,
-	superuser boolean DEFAULT FALSE
-	);
-
-INSERT INTO users (un, pw, superuser) VALUES ('root', 'root', TRUE);
+CREATE USER root WITH CREATEDB CREATEROLE SUPERUSER PASSWORD 'root';
+ALTER DATABASE root_default owner to root;
 
 COMMIT;
-
-ANALYZE users;
