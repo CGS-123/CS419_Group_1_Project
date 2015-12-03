@@ -16,20 +16,16 @@ class queryDB:
         self.screen = screen
 
 
-    def do(self):
-      ###good spot to put a "users member" variable for current db instead of worlddb
-        currentDB = 'worlddb'
+    def do(self, dbname):
         self.screen.clear()
         queryDB.display_top_left(self, "Please enter a query to execute below:\n")
         curses.echo()
         string = self.screen.getstr()
         
-        queryDB.run(self, string, currentDB)
+        queryDB.run(self, string, dbname)
 
 
     def save(self):
-      ###good spot to put a "users member" variable for current db instead of worlddb
-        currentDB = 'worlddb'
         self.screen.clear()
         queryDB.display_top_left(self, "Please enter a query save below:\n")
         curses.echo()
@@ -39,18 +35,14 @@ class queryDB:
         self.screen.clear()
         
 
-    def get_history(self):
-      ###good spot to put a "users member" variable for current db instead of worlddb
-        currentDB = 'worlddb'
+    def get_history(self, dbname):
         history = query.query('SELECT query FROM queries_history ORDER BY id DESC LIMIT 100', 'queries')
-        queryDB.display(self, history, currentDB)
+        queryDB.display(self, history, dbname)
         
 
-    def get_saved(self):
-      ###good spot to put a "users member" variable for current db instead of worlddb
-        currentDB = 'worlddb'
+    def get_saved(self, dbname):
         saved = query.query('SELECT query FROM queries_saved ORDER BY id DESC LIMIT 100', 'queries')
-        queryDB.display(self, saved, currentDB)
+        queryDB.display(self, saved, dbname)
                 
 
     def run(self, string, currentDB):
@@ -90,7 +82,7 @@ class queryDB:
                     self.screen.addstr(i + j, 0, data[1][i][0], curses.A_DIM)
                 if dim[1] < len(data[1][i][0]):
                     j += len(data[1][i][0])//dim[1]
-            if i == 0:
+            if not data[1]:
                 error.throw(self.screen, "No queries available.")
                 self.screen.clear()
                 return
@@ -109,4 +101,19 @@ class queryDB:
     def display_top_left(self, message):
         self.screen.addstr(0, 0, message, curses.A_BOLD)
         self.screen.refresh()
+
+    def display_all_database_save(self):   
+        parsed_dbs = []
+        databases = self.fetch_all_databases()
+        if databases is not None:
+            for db in databases:
+                lst = list(db)
+                lst.append(curses.flash)
+                parsed_dbs.append(tuple(lst))
+            displayDatabasesMenu = Menu(parsed_dbs, self.screen)
+            displayDatabasesMenu.display()
+
+    def fetch_all_databases(self):
+        databases = query.query(self.all_databases_query, 'postgres', self.screen)
+        return databases[1]
 

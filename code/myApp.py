@@ -48,10 +48,10 @@ class MyApp(object):
         browse_table = Menu(browse_table_items, self.screen) 
 
         query_items = [                                                    
-                ('Enter A Query', self.query_manager.do),
+                ('Enter A Query', self.database_manager.display_all_databases_opt, self.query_manager.do),
                 ('Save A Query', self.query_manager.save),                                       
-                ('View Past Queries', self.query_manager.get_history),
-                ('View Saved Queries', self.query_manager.get_saved)                                      
+                ('View Past Queries', self.database_manager.display_all_databases_opt, self.query_manager.get_history),
+                ('View Saved Queries', self.database_manager.display_all_databases_opt, self.query_manager.get_saved)                                      
                 ]                                                            
         query = Menu(query_items, self.screen) 
 

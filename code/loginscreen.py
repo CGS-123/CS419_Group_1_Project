@@ -54,7 +54,7 @@ class LoginScreen:
         to_query = "SELECT * FROM pg_catalog.pg_roles WHERE rolname LIKE \'%s\'" % self.username
         rows = query.query(to_query, 'postgres', self.screen)
         
-        if rows:
+        if rows[1]:
             ScreenManager.throw(self.screen, 'Username already in use.')
             return LoginScreen.create_user(self)
         else:
