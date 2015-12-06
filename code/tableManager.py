@@ -22,3 +22,18 @@ class TableManager(object):
             parsed_table_menu.append(tuple(lst))
         table_menu = Menu(parsed_table_menu,self.screen)
         table_menu.display()
+        
+    def createTable(self, dbname):
+        self.screen_manager.set_cursor_visible()
+        curses.echo()
+        self.screen_manager.display_mid("Please enter a name for the new table: ")
+        new_table_name = self.screen_manager.screen.getstr()
+        self.screen.clear()
+        
+        table_creation_query = "CREATE TABLE IF NOT EXISTS " + new_table_name + "(ID INT PRIMARY KEY      NOT NULL);" 
+        if query.query(table_creation_query, dbname, self.screen, 0) == -1:
+            ScreenManager.throw(self.screen, "An error prevented table creation.")
+        else:
+            self.screen_manager.display_mid("Table successfully created!")
+            self.screen_manager.screen.getstr()
+        self.screen.clear()
