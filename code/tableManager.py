@@ -1,7 +1,7 @@
 import curses
 import psycopg2
 from query import query
-from error import error
+from tableDisplay import tableDisplay
 from menu import Menu
 from screenmanager import ScreenManager
 from databaseManager import DatabaseManager
@@ -18,11 +18,20 @@ class TableManager(object):
         rows = query.query(table_query, dbname, self.screen)
         parsed_table_menu = []
         for datas in rows[1]:
-            lst = (str(datas[0]),curses.flash)
+            opts = {'table':str(datas[0]), 'db':dbname}
+            lst = (str(datas[0]), self.showTable, opts)
             parsed_table_menu.append(tuple(lst))
         table_menu = Menu(parsed_table_menu,self.screen)
         table_menu.display()
-        
+    
+    def showTable(self, options):
+        table = options['table']
+        db = options['db']
+        display_query = "SELECT * from " + table
+        rows = query.query(display_query, db, self.screen)
+        tableDisplay.navigate(rows,0,0,self.screen)
+        self.screen.clear()
+
     def createTable(self, dbname):
         self.screen_manager.set_cursor_visible()
         curses.echo()
