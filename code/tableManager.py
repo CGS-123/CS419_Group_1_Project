@@ -46,13 +46,19 @@ class TableManager(object):
         if confirmation == 'y' or confirmation == "Y":
             tbl_delete_query = "DROP TABLE " + table + " CASCADE"
             if query.query(tbl_delete_query, db, self.screen, 0) == -1:
-                self.screen_manager.throw(self.screen ,"ERROR deleting table")
+                self.screen_manager.display_mid("ERROR deleting table")
+                self.screen.getch()
+                self.screen.clear()
             else:
-                self.screen_manager.throw(self.screen, "Table " + table + " deleted.")
-
-
+                self.screen_manager.display_mid("Table " + table + " deleted.")
+                self.screen.getch()
+                self.screen.clear()
         else:
-            self.screen_manager.display_mid(tbl + " will not be deleted.")
+            self.screen_manager.display_mid("Table " + table + " will not be deleted.")
+            self.screen.getch()
+            self.screen.clear()
+        self.screen.clear()
+
 
     def list_drop_tables(self, dbname):
         table_query = "SELECT table_name FROM information_schema.tables where table_schema = 'public'"
