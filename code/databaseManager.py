@@ -41,7 +41,8 @@ class DatabaseManager(object):
                 lst = list(db)
                 lst.append(curses.flash)
                 parsed_dbs.append(tuple(lst))
-            displayDatabasesMenu = Menu(parsed_dbs, self.screen)
+            headeroptions = {'title':"List of Databases"}
+            displayDatabasesMenu = Menu(parsed_dbs, self.screen, headeroptions)
             displayDatabasesMenu.display()
 
     #Display methods
@@ -52,7 +53,8 @@ class DatabaseManager(object):
             for db in databases:
                 lst = (str(db[0]),action,str(db[0]))
                 parsed_dbs.append(tuple(lst))
-            displayDatabasesMenu = Menu(parsed_dbs, self.screen)
+            headoptions = {'title':"Select Database"}
+            displayDatabasesMenu = Menu(parsed_dbs, self.screen, headoptions)
             displayDatabasesMenu.display()
     
     def display_all_copy_database(self):   
@@ -64,7 +66,8 @@ class DatabaseManager(object):
                 lst.append(self.copy_database)
                 lst.append(db)
                 parsed_dbs.append(tuple(lst))
-            displayDatabasesMenu = Menu(parsed_dbs, self.screen)
+            headoptions = {'title':"Select Database to Copy"}
+            displayDatabasesMenu = Menu(parsed_dbs, self.screen, headoptions)
             displayDatabasesMenu.display()
     
     def display_all_delete_database(self):   
@@ -76,7 +79,8 @@ class DatabaseManager(object):
                 lst.append(self.drop_database)
                 lst.append(db)
                 parsed_dbs.append(tuple(lst))
-            displayDatabasesMenu = Menu(parsed_dbs, self.screen)
+            headoptions = {'title':"Select Database to delete"}
+            displayDatabasesMenu = Menu(parsed_dbs, self.screen, headoptions)
             displayDatabasesMenu.display()
             
     def copy_database(self, database):

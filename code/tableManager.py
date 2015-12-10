@@ -21,7 +21,8 @@ class TableManager(object):
             opts = {'table':str(datas[0]), 'db':dbname}
             lst = (str(datas[0]), self.showTable, opts)
             parsed_table_menu.append(tuple(lst))
-        table_menu = Menu(parsed_table_menu,self.screen)
+        headeropts = {'db':dbname,'title':"Select Table to Display"}
+        table_menu = Menu(parsed_table_menu,self.screen, headeropts)
         table_menu.display()
     
     def showTable(self, options):
@@ -77,5 +78,6 @@ class TableManager(object):
             opts = {'db':dbname,'table':str(datas[0])}
             lst = (str(datas[0]),self.drop_table, opts)
             parsed_table_menu.append(tuple(lst))
-        table_menu = Menu(parsed_table_menu,self.screen)
+        headeropts = {'db':dbname,'title':"Select Table to Drop"}
+        table_menu = Menu(parsed_table_menu,self.screen, headeropts)
         table_menu.display()
