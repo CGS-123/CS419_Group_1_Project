@@ -41,7 +41,7 @@ class MyApp(object):
         browse_table_items = [
                 ('List Tables', self.database_manager.display_all_databases_opt, self.table_manager.listTables),                                                    
                 ('Create', self.database_manager.display_all_databases_opt, self.table_manager.createTable),                                       
-                ('Delete', curses.flash),
+                ('Delete', self.database_manager.display_all_databases_opt, self.table_manager.list_drop_tables),
                 ('Copy', curses.flash),
                 ('Alter', curses.flash)                                      
                 ]                                                            
