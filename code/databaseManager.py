@@ -11,18 +11,18 @@ class DatabaseManager(object):
         self.screen = stdscreen
         self.dimensions = self.screen.getmaxyx() 
         self.screen_manager = ScreenManager(self.screen)
-        self.all_databases_query = "SELECT datname FROM pg_database WHERE datistemplate = false"
+        self.all_databases_query = "SELECT pg_catalog.pg_database.datname FROM pg_catalog.pg_database WHERE pg_catalog.pg_get_userbyid(pg_catalog.pg_database.datdba) = \'%s\';" % (self.username)
         self.all_tables_query = "SELECT table_schema,table_name FROM information_schema.tables ORDER BY table_schema,table_name;"
         self.current_database = None
         
     #Database query methods
     def fetch_all_databases(self):
-        databases = query.query(self.all_databases_query, 'postgres', self.screen, 0, None, self.username, self.password)
+        databases = query.query(self.all_databases_query, 'postgres', self.screen, None, None, self.username, self.password)
         return databases[1]
         
     def create_database(self, name):
         to_query = "SELECT 1 FROM pg_database WHERE datname = \'%s\'" % (name)
-        database_exists = query.query(to_query, 'postgres', self.screen, 0, None, self.username, self.password)
+        database_exists = query.query(to_query, 'postgres', self.screen, None, None, self.username, self.password)
         if database_exists[1]:
             ScreenManager.throw(self.screen, 'Database already exists.')
             return False
