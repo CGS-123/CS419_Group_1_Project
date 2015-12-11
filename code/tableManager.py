@@ -8,20 +8,22 @@ from databaseManager import DatabaseManager
 from query import query
 
 class TableManager(object):
-    def __init__(self,stdscreen):
+    def __init__(self, stdscreen, userpass):
+        self.username = userpass['user']
+        self.password = userpass['pass']
         self.screen = stdscreen
         self.dimensions = self.screen.getmaxyx() 
         self.screen_manager = ScreenManager(self.screen)
 
     def listTables(self, dbname):
         table_query = "SELECT table_name FROM information_schema.tables where table_schema = 'public'"
-        rows = query.query(table_query, dbname, self.screen)
+        rows = query.query(table_query, dbname, self.screen, None, None, self.username, self.password)
         parsed_table_menu = []
         for datas in rows[1]:
             opts = {'table':str(datas[0]), 'db':dbname}
             lst = (str(datas[0]), self.showTable, opts)
             parsed_table_menu.append(tuple(lst))
-        headeropts = {'db':dbname,'title':"Select Table to Display"}
+        headeropts = {'db':dbname,'title':"Select Table to Display",'user':self.username}
         table_menu = Menu(parsed_table_menu,self.screen, headeropts)
         table_menu.display()
     
@@ -29,7 +31,7 @@ class TableManager(object):
         table = options['table']
         db = options['db']
         display_query = "SELECT * from " + table
-        rows = query.query(display_query, db, self.screen)
+        rows = query.query(display_query, db, self.screen, None, None, self.username, self.password)
         tableDisplay.navigate(rows,0,0,self.screen)
         self.screen.clear()
 
@@ -41,7 +43,7 @@ class TableManager(object):
         self.screen.clear()
         
         table_creation_query = "CREATE TABLE IF NOT EXISTS " + new_table_name + "(ID INT PRIMARY KEY      NOT NULL);" 
-        if query.query(table_creation_query, dbname, self.screen, 0) == -1:
+        if query.query(table_creation_query, dbname, self.screen, 0, None, self.username, self.password) == -1:
             ScreenManager.throw(self.screen, "An error prevented table creation.")
         else:
             self.screen_manager.display_mid("Table successfully created!")
@@ -72,12 +74,12 @@ class TableManager(object):
 
     def list_drop_tables(self, dbname):
         table_query = "SELECT table_name FROM information_schema.tables where table_schema = 'public'"
-        rows = query.query(table_query, dbname, self.screen)
+        rows = query.query(table_query, dbname, self.screen, None, None, self.username, self.password)
         parsed_table_menu = []
         for datas in rows[1]:
             opts = {'db':dbname,'table':str(datas[0])}
             lst = (str(datas[0]),self.drop_table, opts)
             parsed_table_menu.append(tuple(lst))
-        headeropts = {'db':dbname,'title':"Select Table to Drop"}
+        headeropts = {'db':dbname,'title':"Select Table to Drop",'user':self.username}
         table_menu = Menu(parsed_table_menu,self.screen, headeropts)
         table_menu.display()

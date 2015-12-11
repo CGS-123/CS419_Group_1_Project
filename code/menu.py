@@ -21,10 +21,12 @@ class Menu(object):
 
     def parseheaderopts(self, header_opts):
         header = ""
+        if 'user' in header_opts:
+            header += "| " + header_opts['user'] + " |"
         if 'db' in header_opts:
-            header = "Current Databease: " + header_opts['db']
+            header += "Current Databease: " + header_opts['db'] + "|"
         if 'title' in header_opts:
-            header += "  ("  + header_opts['title'] + ") "
+            header += "("  + header_opts['title'] + ")"
         return header
 
     def navigate(self, n):                                                   
