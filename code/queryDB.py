@@ -12,8 +12,10 @@ from tableDisplay import tableDisplay
 # by querying the queries db manually.
 
 class queryDB:
-    def __init__(self, screen):
+    def __init__(self, screen, userpass):
         self.screen = screen
+        self.username = userpass['user']
+        self.password = userpass['pass']
 
 
     def do(self, dbname):
@@ -114,6 +116,6 @@ class queryDB:
             displayDatabasesMenu.display()
 
     def fetch_all_databases(self):
-        databases = query.query(self.all_databases_query, 'postgres', self.screen)
+        databases = query.query(self.all_databases_query, 'postgres', self.screen, None, None, self.username, self.password)
         return databases[1]
 

@@ -8,7 +8,9 @@ from menu import Menu
 from error import error
 
 class impexp(object):
-    def __init__(self, stdscreen):
+    def __init__(self, stdscreen, userpass):
+        self.username = userpass['user']
+        self.password = userpass['pass']
         self.screen = stdscreen
     def export(self, dbname):
     
@@ -19,7 +21,7 @@ class impexp(object):
         """
 
         #make connection between python and postgresql
-        conn = psycopg2.connect("dbname='"+dbname+"' user='vagrant' password='vagrant'")
+        conn = psycopg2.connect("dbname='" + dbname + "' user='" + self.username + "' password='" + self.password + "'")
         cur = conn.cursor()
 
         cur.execute(query)
@@ -48,7 +50,8 @@ class impexp(object):
                 parsed_file.append(tuple(lst))
                 count = 1
         if count == 1:
-            sqlfiles = Menu(parsed_file, self.screen)
+            headeropts = {'db':dbname, 'title':"Select file to import", 'user':self.username}
+            sqlfiles = Menu(parsed_file, self.screen, headeropts)
             sqlfiles.display()
         else:
             error.throw(self.screen, "No .sql files")
@@ -56,7 +59,7 @@ class impexp(object):
     def import_sql(self, options):
         file = options['file']
         dbname = options['dbname']
-        conn = psycopg2.connect("dbname='"+dbname+"' user='vagrant' password='vagrant'")
+        conn = psycopg2.connect("dbname='" + dbname + "' user='" + self.username + "' password='" + self.password + "'")
         cur = conn.cursor()
         cur.execute(open(file, "r").read())
         message = "Import of "+ file +" successful!!"
